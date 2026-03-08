@@ -13,7 +13,7 @@ export async function connectCDP() {
         if (!target) {
             console.error(`[CDP Client] No tab found matching URL part: "${config.SCANNER_URL_MATCH}"`);
             console.error('[CDP Client] Available tabs:', targets.map(t => t.url));
-            process.exit(1);
+            throw new Error(`[CDP Client] No tab found matching URL part: "${config.SCANNER_URL_MATCH}"`);
         }
 
         console.log(`[CDP Client] Found target tab: ${target.url}`);
@@ -27,14 +27,13 @@ export async function connectCDP() {
         console.log(`[CDP Client] Connected to Target at ${config.CDP_HOST}:${config.CDP_PORT}`);
 
         client.on('disconnect', () => {
-            console.error('[CDP Client] Disconnected from Chrome. Exiting...');
-            process.exit(1);
+            console.error('[CDP Client] Disconnected from Chrome. Throwing error...');
+            (client as any).emit('error', new Error('Disconnected from Chrome'));
         });
 
         return client;
     } catch (err) {
         console.error(`[CDP Client] Failed to connect to Chrome at ${config.CDP_HOST}:${config.CDP_PORT}.`, err);
-        process.exit(1);
         throw err;
     }
 }

@@ -1,6 +1,6 @@
 # 🏗️ АРХИТЕКТУРА ПРОЕКТА — PULSE TEAM BOT
 
-Дата генерации: 2026-03-08 11:38:00
+Дата генерации: 2026-03-08 12:23:38
 Рабочая директория: /Users/georgijbusiness/XT scanner 
 
 ***
@@ -9,7 +9,7 @@
 
 ### Статистика:
 - Всего директорий: 6
-- Всего файлов: 17
+- Всего файлов: 18
 - Python файлов: 0
 - TypeScript/JS файлов: 3
 - Svelte компонентов: 0
@@ -37,7 +37,8 @@ coffee-loyalty-2026/
 |   |   `-- 01_ADR.md
 |   |-- README.MD
 |   |-- ROADMAP.md
-|   `-- help docs
+|   `-- help_docs
+|       |-- Telemetry.md
 |       `-- UPDATE_DOCS_PROMPT.MD
 `-- Архитектура Feature First.md
 
@@ -83,12 +84,28 @@ import { config } from '../../config';
 
 export async function connectCDP() {
     try {
+        const targets = await CDP.List({
+            host: config.CDP_HOST,
+            port: config.CDP_PORT
+        });
+
+        const target = targets.find((t) => t.url.includes(config.SCANNER_URL_MATCH));
+
+        if (!target) {
+            console.error(`[CDP Client] No tab found matching URL part: "${config.SCANNER_URL_MATCH}"`);
+            console.error('[CDP Client] Available tabs:', targets.map(t => t.url));
+            process.exit(1);
+        }
+
+        console.log(`[CDP Client] Found target tab: ${target.url}`);
+
         const client = await CDP({
             host: config.CDP_HOST,
             port: config.CDP_PORT,
+            target: target.webSocketDebuggerUrl
         });
 
-        console.log(`[CDP Client] Connected to Chrome at ${config.CDP_HOST}:${config.CDP_PORT}`);
+        console.log(`[CDP Client] Connected to Target at ${config.CDP_HOST}:${config.CDP_PORT}`);
 
         client.on('disconnect', () => {
             console.error('[CDP Client] Disconnected from Chrome. Exiting...');
@@ -159,7 +176,7 @@ main();
 * **Правила безопасности (Anti-Ban):**
   * **Строгий Read-Only режим:** Абсолютно ЗАПРЕЩАЕТСЯ вмешиваться в DOM-дерево страницы стороннего сканера, использовать команды `Runtime.evaluate` для инъекции JS-кода или изменять глобальные переменные.
   * Запрещается создавать параллельные WebSocket подключения к серверу сканера.
-  * Телеметрия стороннего сканера (`ui_telemetry_batch`) не должна блокироваться; система должна позволять браузеру естественным образом отправлять данные о потере фокуса при открытии новых вкладок.
+  * **Телеметрия (`ui_telemetry_batch`):** В ходе аудита безопасности установлено, что потеря фокуса (`has_focus: false`) или скрытие страницы (`visibility: hidden`) — это естественное поведение пользователя при переходе на вкладки бирж. Открытие новых вкладок (в фоне или активно) с помощью скрипта полностью безопасно и не вызывает подозрений у сервера. Любая мусорная телеметрия игнорируется на уровне парсера (Read-Only подход).
   * CDP-подключение должно производиться на нестандартный порт (отличный от дефолтного 9222).
 
 ## 3. Сущности
@@ -187,7 +204,7 @@ main();
 
 ## 3. Слой общих инструментов (Core)
 Слой содержит инструменты, которые используют все фичи, но сами фичами не являются:
-* **`core/network/cdp_client.ts`**: Менеджер подключения к Chrome DevTools Protocol. Отвечает за установку соединения на нестандартном порту и поддержание сессии.
+* **`core/cdp_client.ts`**: Менеджер подключения к Chrome DevTools Protocol. Реализует механизм **Target Discovery** (поиск вкладки сканера среди открытых вкладок). Сначала он запрашивает список вкладок (`CDP.List`), находит нужную по совпадению с `config.SCANNER_URL_MATCH`, и только потом подключается непосредственно к ней. Отвечает за поддержание сессии в режиме Fail-Fast.
 * **`core/event_bus/`**: Реализация шины событий. Центр обмена сообщениями между фичами.
 
 ## 4. Слой переиспользуемого кода (Shared)
@@ -273,7 +290,8 @@ export interface IExchangeData {
 * **Протокол:** Chrome DevTools Protocol (CDP).
 * **Библиотека:** `chrome-remote-interface` (Node.js).
 * **Сетевая инфраструктура:** Подключение происходит исключительно через `localhost` (127.0.0.1) на кастомный порт отладки (например, `48192`), отличный от стандартного 9222.
-* **Жизненный цикл (Ручной запуск):** Скрипт работает в режиме "On-Demand" (по запросу). Пользователь вручную запускает скрипт (через терминал или ярлык) после открытия целевой вкладки сканера. Остановка скрипта мгновенно разрывает CDP-сессию без влияния на работу браузера.
+* **Жизненный цикл и Target Discovery (Ручной запуск):** Скрипт работает в режиме "On-Demand" (по запросу). При запуске он выполняет поиск нужной вкладки (сканера) среди всех открытых целевых вкладок по фрагменту URL (`SCANNER_URL_MATCH`). Если вкладка не найдена — скрипт выводит доступные и завершается. Остановка скрипта мгновенно разрывает CDP-сессию без влияния на работу браузера.
+* **Изолированный профиль (Инструкция по запуску):** Для работы сканера используется специальный флаг ` --user-data-dir="/tmp/chrome_dev_test"`. Это создает изолированную сессию (macOS), которая не конфликтует с обычными окнами пользователя и гарантированно корректно открывает порт отладки без сбоев.
 
 ## 2. API-провайдеры (Биржи)
 В рамках Итерации 1 скрипт **НЕ использует** REST/WebSocket API бирж (XT.com, Jupiter). 
@@ -513,10 +531,11 @@ xt-scanner/
 * **Задачи для ИИ:**
   1. Инициализация Node.js проекта (`package.json`, `tsconfig.json`).
   2. Создание `config.ts` с настройками (порт отладки `48192`).
-  3. Создание модуля `src/core/cdp_client.ts` для подключения к браузеру (через `puppeteer-core` или `chrome-remote-interface`).
+  3. Создать модуля `src/core/cdp_client.ts` для подключения к браузеру (через `puppeteer-core` или `chrome-remote-interface`).
+  3.5. **Микро-шаг 1.5:** Внедрение Target Discovery — запрос `CDP.List` и поиск целевой вкладки по `config.SCANNER_URL_MATCH` перед передачей `target` в рабочую сессию.
   4. Создание базового `src/main.ts`, который устанавливает соединение, включает `Network.enable` и выводит в консоль все входящие события `Network.webSocketFrameReceived`.
 * **Критерии приемки (Как тестируем):**
-  1. Запускаем Chrome с флагом `--remote-debugging-port=48192`.
+  1. Запускаем Chrome: /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=48192 --user-data-dir="/tmp/chrome_dev_test"
   2. Запускаем скрипт.
   3. Открываем любой сайт с веб-сокетами (или оригинальный сканер) и убеждаемся, что в консоль терминала падают сырые сетевые пакеты.
 
@@ -531,6 +550,7 @@ xt-scanner/
   2. Создать модуль `src/features/scanner.ts`.
   3. Реализовать в модуле логику парсинга JSON из фреймов, игнорирование системной телеметрии (например, `ui_telemetry_batch`) и фильтрацию по биржам (ищем `xt` в CEX и `jup`/`raydium` в DEX).
   4. Обновить `main.ts` для использования сканера.
+  5. **Непрерывность работы:** Реализовать цикл `while(true)` в `main.ts` с ожиданием (например, 3 секунды) для бесконечных попыток автоматического переподключения (Авто-реконнект), если сессия была разорвана (например, вкладка обновлена или закрыта). Отказаться от `process.exit(1)`.
 * **Критерии приемки (Как тестируем):**
   1. Запускаем скрипт и оригинальный сканер.
   2. При поступлении реального сигнала в консоли должен появиться аккуратно распарсенный JSON (или лог с тикером и профитом), а мусорный трафик должен молча игнорироваться.
@@ -565,13 +585,132 @@ xt-scanner/
   3. При поступлении дубля этого же сигнала через пару секунд новые вкладки **не** открываются.
 ```
 
+#### 📄 _docs/help_docs/Telemetry.md
+```markdown
+# Шаблон Телеметрии (ui_telemetry_batch)
+
+**Тип сообщения:** `ui_telemetry_batch`
+**Описание:** Пример пакета телеметрии, который сканер шлет на сервер по WebSocket.
+
+```json
+{
+    "type": "ui_telemetry_batch",
+    "session_id": "90dc550a-3b58-4b7a-b6e2-05ae385cc854",
+    "sent_at_ms": 1772886933387,
+    "random_bucket": 390,
+    "events": [
+        {
+            "ts_client_ms": 1772886226445,
+            "path": "/solana/arb",
+            "event_type": "ui_heartbeat",
+            "visibility": "visible",
+            "has_focus": false,
+            "connection_status": "CONNECTED",
+            "user_id": "702060416",
+            "random_bucket": 911
+        },
+        {
+            "ts_client_ms": 1772886256524,
+            "path": "/solana/arb",
+            "event_type": "ui_heartbeat",
+            "visibility": "visible",
+            "has_focus": false,
+            "connection_status": "CONNECTED",
+            "user_id": "702060416",
+            "random_bucket": 889
+        },
+        {
+            "ts_client_ms": 1772886326134,
+            "path": "/solana/arb",
+            "event_type": "ui_heartbeat",
+            "visibility": "visible",
+            "has_focus": false,
+            "connection_status": "CONNECTED",
+            "user_id": "702060416",
+            "random_bucket": 649
+        },
+        {
+            "ts_client_ms": 1772886388850,
+            "path": "/solana/arb",
+            "event_type": "ui_heartbeat",
+            "visibility": "visible",
+            "has_focus": false,
+            "connection_status": "CONNECTED",
+            "user_id": "702060416",
+            "random_bucket": 900
+        },
+        {
+            "ts_client_ms": 1772886431539,
+            "path": "/solana/arb",
+            "event_type": "ui_heartbeat",
+            "visibility": "visible",
+            "has_focus": false,
+            "connection_status": "CONNECTED",
+            "user_id": "702060416",
+            "random_bucket": 971
+        },
+        {
+            "ts_client_ms": 1772886480416,
+            "path": "/solana/arb",
+            "event_type": "ui_page_hide",
+            "visibility": "visible",
+            "has_focus": false,
+            "connection_status": "CONNECTED",
+            "user_id": "702060416",
+            "random_bucket": 235
+        },
+        {
+            "ts_client_ms": 1772886480417,
+            "path": "/solana/arb",
+            "event_type": "ui_visibility_change",
+            "visibility": "hidden",
+            "has_focus": false,
+            "connection_status": "CONNECTED",
+            "user_id": "702060416",
+            "random_bucket": 921
+        },
+        {
+            "ts_client_ms": 1772886481147,
+            "path": "/solana/arb",
+            "event_type": "ui_page_open",
+            "visibility": "visible",
+            "has_focus": false,
+            "connection_status": "CONNECTING",
+            "user_id": "702060416",
+            "random_bucket": 642
+        },
+        {
+            "ts_client_ms": 1772886481147,
+            "path": "/solana/arb",
+            "event_type": "ws_status_change",
+            "visibility": "visible",
+            "has_focus": false,
+            "connection_status": "CONNECTING",
+            "user_id": "702060416",
+            "random_bucket": 636
+        },
+        {
+            "ts_client_ms": 1772886481280,
+            "path": "/solana/arb",
+            "event_type": "ws_status_change",
+            "visibility": "visible",
+            "has_focus": false,
+            "connection_status": "CONNECTED",
+            "user_id": "702060416",
+            "random_bucket": 906
+        }
+    ]
+}```
+
+```
+
 📊 ИТОГОВАЯ СТАТИСТИКА
 По типам файлов:
 Python (.py): 0 файлов, 0 строк кода
-TypeScript/JavaScript (.ts, .js): 3 файлов, 48 строк
+TypeScript/JavaScript (.ts, .js): 3 файлов, 61 строк
 Svelte (.svelte): 0 файлов, 0 строк
 Config файлы: 3 файлов
-Markdown: 11 файлов
+Markdown: 12 файлов
 
 По модулям:
 Core modules: 0 файлов

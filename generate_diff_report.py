@@ -29,8 +29,8 @@ IGNORED_FILES = [
 # Этот скрипт также использует стандартный .gitignore вашего проекта.
 # Если вы хотите скрыть папку (например, venv/), добавьте её в файл .gitignore в корне проекта.
 
-# Директория git-репозитория проекта
-REPO_DIR = "/Users/georgijbusiness/AndrewRealEstate/pulse_team_bot_real_estate"
+# Директория git-репозитория проекта (определяется автоматически)
+REPO_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def generate_markdown_diff():
     # Get the root of the git repo
@@ -38,7 +38,7 @@ def generate_markdown_diff():
         repo_root = subprocess.check_output(
             ['git', 'rev-parse', '--show-toplevel'],
             cwd=REPO_DIR
-        ).decode('utf-8').strip()
+        ).decode('utf-8').rstrip('\n')
     except subprocess.CalledProcessError:
         print("Error: Not a git repository")
         return

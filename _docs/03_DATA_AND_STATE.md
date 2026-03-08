@@ -22,24 +22,22 @@
 Строгая типизация входящего сигнала из WebSocket-трафика. 
 
 ```typescript
-// shared/api/types.ts
-
-export interface ISignalPayload {
-  symbol: string;             // Тикер (например, "PYBOBO")
-  address: string;            // Смарт-контракт для ссылки на Jupiter
-  network: string;
-  arb_percent: number;        // % профита
-  arbitrage_amount_usdt: number; // Объем профита в USDT
-  
-  // Данные бирж
-  big: IExchangeData;         // Должно содержать XT.com (CEX)
-  small: IExchangeData;       // Должно содержать Jupiter/Raydium (DEX)
-}
+// src/shared/types.ts
 
 export interface IExchangeData {
-  exchange: string;           // Фильтруем по этому полю (ищем 'xt', 'xtcom' и т.д.)
-  market: string;
-  symbol: string;
+  exchange: string;           // Биржа (например 'MEXC', 'xt', 'JUP')
+}
+
+export interface ISignalPayload {
+  symbol: string;             // Тикер (например, "RNGR")
+  arb_percent: number;        // Процент арбитража (например, 0.63)
+  arbitrage_amount_usdt: number; // Объем в USDT
+  
+  small: IExchangeData;       // Биржа покупки (CEX, отстающая)
+  big: IExchangeData;         // Биржа продажи (DEX, ценообразующая)
+  
+  buy_url?: string;           // Готовая ссылка (опционально)
+  sell_url?: string;          // Готовая ссылка (опционально)
 }
 ```
 
