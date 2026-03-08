@@ -1,0 +1,24 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# TypeScript
+dist/
+build/
+out/
+.tscache/
+tsconfigs.json.tsbuildinfo
+
+# OS / Environment
+.DS_Store
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# Notes
+# PROJECT_STRUCTURE.md will not be ignored unless specifically listed here
