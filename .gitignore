@@ -21,4 +21,5 @@ tsconfigs.json.tsbuildinfo
 .idea/
 
 # Notes
-# PROJECT_STRUCTURE.md will not be ignored unless specifically listed here
+PROJECT_STRUCTURE.md
+CHANGES_REPORT.md

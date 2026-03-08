@@ -1,6 +1,18 @@
 import { config } from '../../config';
 import { ISignalPayload } from '../shared/types';
 
+const spamCache = new Map<string, number>();
+
+// Фоновая очистка кэша каждые 2 минуты для предотвращения утечки памяти
+setInterval(() => {
+    const now = Date.now();
+    for (const [symbol, lastSeen] of spamCache.entries()) {
+        if (now - lastSeen >= config.ANTI_SPAM_TTL_MS) {
+            spamCache.delete(symbol);
+        }
+    }
+}, 120000).unref(); // unref() позволяет Node.js завершить процесс, если нет других активных задач
+
 export function parseWebSocketFrame(frame: string): ISignalPayload[] {
     // 1. Выводим сырые данные ДО парсинга, если включен дебаг
     if (config.DEBUG_RAW_SIGNALS) {
@@ -29,6 +41,15 @@ export function parseWebSocketFrame(frame: string): ISignalPayload[] {
                 if (config.CEX_FILTER_ENABLED && smallExchangeStr !== targetCexStr) {
                     continue;
                 }
+
+                const now = Date.now();
+                const lastSeen = spamCache.get(item.symbol) || 0;
+
+                if (now - lastSeen < config.ANTI_SPAM_TTL_MS) {
+                    continue;
+                }
+
+                spamCache.set(item.symbol, now);
 
                 signals.push({
                     symbol: item.symbol,

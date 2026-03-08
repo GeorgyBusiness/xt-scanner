@@ -1,9 +1,11 @@
 import { connectCDP } from './core/cdp_client';
 import { parseWebSocketFrame } from './features/scanner';
+import { AppEventBus } from './core/event_bus';
+import { initLogger } from './features/logger';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-async function runSession() {
+async function runSession(eventBus: AppEventBus) {
     console.log('[Main] Starting new session...');
     const client = await connectCDP();
     const { Network } = client;
@@ -18,6 +20,7 @@ async function runSession() {
                 const signals = parseWebSocketFrame(payloadData);
                 for (const signal of signals) {
                     console.log(`[🔥 СИГНАЛ] ${signal.symbol} | ${signal.small.exchange} -> ${signal.big.exchange} | Профит: ${signal.arb_percent}% ($${signal.arbitrage_amount_usdt})`);
+                    eventBus.emitSignal(signal);
                 }
             }
         });
@@ -37,6 +40,9 @@ async function runSession() {
 async function main() {
     console.log('[Main] Starting XT Scanner Iteration 2 (Auto-Reconnect)...');
 
+    const eventBus = new AppEventBus();
+    initLogger(eventBus);
+
     // Keep process alive strictly (SIGINT handled below)
     process.on('SIGINT', () => {
         console.log('\n[Main] Exiting gracefully...');
@@ -45,7 +51,7 @@ async function main() {
 
     while (true) {
         try {
-            await runSession();
+            await runSession(eventBus);
         } catch (err: any) {
             console.error('[Main] Session error:', err.message);
             console.log('[Main] Waiting 3 seconds before reconnecting...');
