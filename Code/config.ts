@@ -18,4 +18,6 @@ export const config = {
     DEBUG_RAW_SIGNALS: false,
     /** Anti-spam cache TTL in milliseconds */
     ANTI_SPAM_TTL_MS: 60000,
+    /** Fixed buy budget in USDT for sniper execution */
+    FIXED_BUY_USDT: 50,
 };

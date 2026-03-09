@@ -163,6 +163,38 @@ export class XTOrderbookManager {
         return { averagePrice, maxPriceHit, isVolumeSufficient };
     }
 
+    public calculateSweep(maxPriceLimit: number, targetUsdt: number): { safePrice: number, safeAmountUsdt: number } {
+        if (!this.isSnapshotLoaded || this.asks.size === 0) {
+            return { safePrice: 0, safeAmountUsdt: 0 };
+        }
+
+        const sortedAsks = Array.from(this.asks.entries()).sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]));
+
+        let cumulativeUsdt = 0;
+        let safePrice = 0;
+
+        for (const [priceStr, volume] of sortedAsks) {
+            const price = parseFloat(priceStr);
+            if (price > maxPriceLimit) {
+                break;
+            }
+
+            const levelUsdt = price * volume;
+
+            if (cumulativeUsdt + levelUsdt >= targetUsdt) {
+                const remainingUsdt = targetUsdt - cumulativeUsdt;
+                cumulativeUsdt += remainingUsdt;
+                safePrice = price;
+                break;
+            } else {
+                cumulativeUsdt += levelUsdt;
+                safePrice = price;
+            }
+        }
+
+        return { safePrice, safeAmountUsdt: cumulativeUsdt };
+    }
+
     public getTopBids(n: number): [string, number][] {
         return Array.from(this.bids.entries())
             .sort((a, b) => parseFloat(b[0]) - parseFloat(a[0]))

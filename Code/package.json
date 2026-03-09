@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/main.ts",
     "simulate": "ts-node src/simulator.ts",
-    "test:orderbook": "ts-node src/test_orderbook.ts"
+    "test:orderbook": "ts-node src/test_orderbook.ts",
+    "test:sniper": "ts-node src/test_sniper.ts"
   },
   "keywords": [],
   "author": "",
