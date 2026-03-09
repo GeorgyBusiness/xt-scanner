@@ -55,8 +55,18 @@ export function parseWebSocketFrame(frame: string): ISignalPayload[] {
                     symbol: item.symbol,
                     arb_percent: item.arb_percent,
                     arbitrage_amount_usdt: item.arbitrage_amount_usdt,
-                    small: { exchange: item.small.exchange },
-                    big: { exchange: item.big.exchange },
+                    small: {
+                        exchange: item.small.exchange,
+                        avg_price: item.prices_data?.small_avg_price,
+                        min_price: item.prices_data?.min_price_buy,
+                        max_price: item.prices_data?.max_price_buy
+                    },
+                    big: {
+                        exchange: item.big.exchange,
+                        avg_price: item.prices_data?.big_avg_price,
+                        min_price: item.prices_data?.min_price_sell,
+                        max_price: item.prices_data?.max_price_sell
+                    },
                     buy_url: item.buy_url,
                     sell_url: item.sell_url
                 });

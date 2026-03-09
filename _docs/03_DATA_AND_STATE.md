@@ -26,6 +26,9 @@
 
 export interface IExchangeData {
   exchange: string;           // Биржа (например 'MEXC', 'xt', 'JUP')
+  avg_price?: number;         // Средняя цена
+  min_price?: number;         // Минимальная цена
+  max_price?: number;         // Максимальная цена
 }
 
 export interface ISignalPayload {
@@ -38,6 +41,10 @@ export interface ISignalPayload {
   
   buy_url?: string;           // Готовая ссылка (опционально)
   sell_url?: string;          // Готовая ссылка (опционально)
+}
+
+export interface IOpenTabsPayload {
+  urls: string[];             // Массив URL для открытия в браузере (после трансформации)
 }
 ```
 

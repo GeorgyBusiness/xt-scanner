@@ -17,5 +17,5 @@ export const config = {
     /** Enable raw signal logging for debugging parser heuristics */
     DEBUG_RAW_SIGNALS: false,
     /** Anti-spam cache TTL in milliseconds */
-    ANTI_SPAM_TTL_MS: 5000,
+    ANTI_SPAM_TTL_MS: 60000,
 };

@@ -2,6 +2,8 @@ import { connectCDP } from './core/cdp_client';
 import { parseWebSocketFrame } from './features/scanner';
 import { AppEventBus } from './core/event_bus';
 import { initLogger } from './features/logger';
+import { initTabManager } from './features/browser_tabs';
+import { IOpenTabsPayload } from './shared/types';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -19,9 +21,18 @@ async function runSession(eventBus: AppEventBus) {
             if (payloadData && typeof payloadData === 'string') {
                 const signals = parseWebSocketFrame(payloadData);
                 for (const signal of signals) {
-                    console.log(`[🔥 СИГНАЛ] ${signal.symbol} | ${signal.small.exchange} -> ${signal.big.exchange} | Профит: ${signal.arb_percent}% ($${signal.arbitrage_amount_usdt})`);
+                    console.log(`[🔥 СИГНАЛ] ${signal.symbol} | ${signal.small.exchange} (${signal.small.avg_price || 'N/A'}) -> ${signal.big.exchange} (${signal.big.avg_price || 'N/A'}) | Профит: ${signal.arb_percent}% ($${signal.arbitrage_amount_usdt})`);
                     eventBus.emitSignal(signal);
                 }
+            }
+        });
+
+        // ОЧИЩАЕМ СТАРЫХ СЛУШАТЕЛЕЙ ПЕРЕД ДОБАВЛЕНИЕМ НОВОГО
+        eventBus.clearOpenTabsListeners();
+
+        eventBus.onOpenTabs(async (payload: IOpenTabsPayload) => {
+            for (const targetUrl of payload.urls) {
+                await client.Target.createTarget({ url: targetUrl });
             }
         });
 
@@ -42,6 +53,7 @@ async function main() {
 
     const eventBus = new AppEventBus();
     initLogger(eventBus);
+    initTabManager(eventBus);
 
     // Keep process alive strictly (SIGINT handled below)
     process.on('SIGINT', () => {

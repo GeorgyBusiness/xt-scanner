@@ -1,5 +1,8 @@
 export interface IExchangeData {
     exchange: string;
+    avg_price?: number;
+    min_price?: number;
+    max_price?: number;
 }
 
 export interface ISignalPayload {
@@ -10,4 +13,8 @@ export interface ISignalPayload {
     big: IExchangeData;
     buy_url?: string;
     sell_url?: string;
+}
+
+export interface IOpenTabsPayload {
+    urls: string[];
 }
