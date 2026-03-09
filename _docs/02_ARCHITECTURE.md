@@ -20,6 +20,7 @@
 ## 5. Слой бизнес-логики (Features)
 Приложение разделено на независимые фичи, каждая из которых решает только одну задачу:
 * **`features/scanner.ts`**: Слушает CDP-трафик (Network domain), выхватывает фреймы веб-сокетов, парсит JSON и фильтрует по целевой CEX. Имеет встроенный In-memory TTL кэш (с фоновой очисткой для предотвращения утечек памяти) для отсечения дублей-спама. 
+* **`features/xt_orderbook.ts`**: Независимый модуль для перехвата и ведения живого стакана (In-Memory Orderbook). Слушает `Network.responseReceived` + `Network.getResponseBody` для получения HTTP-слепков, и дельты из `Network.webSocketFrameReceived`. Математически рассчитывает проскальзывание перед входом в сделку.
 * **`features/browser_tabs.ts`**: Выступает слушателем-трансформатором. Подписан на `SignalDetectedEvent`, трансформирует Swap-ссылки Jupiter в Token-ссылки и публикует `OpenBrowserTabsRequest`.
 * **`features/logger.ts`**: Подписан на `SignalDetectedEvent`. Синхронно гарантирует наличие папки `logs/` при инициализации и безопасно пишет уникальные сигналы в файл `logs/signals_log.jsonl` в режиме append-only. 
 

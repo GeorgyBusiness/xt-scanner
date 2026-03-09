@@ -18,3 +18,16 @@ export interface ISignalPayload {
 export interface IOpenTabsPayload {
     urls: string[];
 }
+
+export interface IXTSnapshotResponse {
+    lastUpdateId: number;
+    bids: [string, string][];
+    asks: [string, string][];
+}
+
+export interface IXTDeltaFrame {
+    i: number;
+    fi: number;
+    a: [string, string][];
+    b: [string, string][];
+}
