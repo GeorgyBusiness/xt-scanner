@@ -1,0 +1,120 @@
+{
+  "timestamp": "2026-03-09T23:10:57.130Z",
+  "symbol": "CTM",
+  "status": "SUCCESS_EXECUTED",
+  "signal_data": {
+    "symbol": "CTM",
+    "arb_percent": 0.34,
+    "arbitrage_amount_usdt": 769,
+    "small": {
+      "exchange": "xt",
+      "avg_price": 0.08328036340779087,
+      "min_price": 0.083,
+      "max_price": 0.0835
+    },
+    "big": {
+      "exchange": "jup",
+      "avg_price": 0.08372694024248561,
+      "min_price": 0.08372694033324973,
+      "max_price": 0.08372694033324973
+    },
+    "buy_url": "https://www.xt.com/ru/trade/ctm_usdt",
+    "sell_url": "https://jup.ag/swap?sell=C8qKVjKNf6JH2yrVVf3aFyny6ZCbHCJUBXTQAT2Em888&buy=Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+  },
+  "math": {
+    "dex_price": 0.08372694024248561,
+    "maxPriceLimit": 0.08364321330224313,
+    "calculated_safePrice": 0.0831,
+    "calculated_safeAmountUsdt": 150,
+    "limit_usdt": 150,
+    "final_price_str": "0.0831",
+    "final_amount_str": "150.00"
+  },
+  "orderbook": {
+    "asks": [
+      [
+        "0.0830",
+        1213.537
+      ],
+      [
+        "0.0831",
+        1248.4116
+      ],
+      [
+        "0.0832",
+        1283.2159
+      ],
+      [
+        "0.0833",
+        1989.9288
+      ],
+      [
+        "0.0834",
+        1369.9205
+      ],
+      [
+        "0.0835",
+        2119.6591
+      ],
+      [
+        "0.0836",
+        1456.1905
+      ],
+      [
+        "0.0837",
+        1490.5775
+      ],
+      [
+        "0.0838",
+        3115.4034
+      ],
+      [
+        "0.0839",
+        1604.7759
+      ],
+      [
+        "0.0840",
+        1619.015
+      ],
+      [
+        "0.0841",
+        1633.2252
+      ],
+      [
+        "0.0842",
+        1647.4066
+      ],
+      [
+        "0.0843",
+        3337.2421
+      ],
+      [
+        "0.0844",
+        1689.7782
+      ]
+    ],
+    "bids": [
+      [
+        "0.0822",
+        316.383
+      ],
+      [
+        "0.0821",
+        325.906
+      ],
+      [
+        "0.0820",
+        335.4523
+      ],
+      [
+        "0.0819",
+        345.0218
+      ],
+      [
+        "0.0818",
+        354.6148
+      ]
+    ]
+  },
+  "error": null
+}

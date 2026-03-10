@@ -1,0 +1,118 @@
+{
+  "timestamp": "2026-03-10T00:19:47.054Z",
+  "symbol": "BILLY",
+  "status": "ABORTED_INSUFFICIENT_VOLUME",
+  "signal_data": {
+    "symbol": "BILLY",
+    "arb_percent": 2.53,
+    "arbitrage_amount_usdt": 333.65,
+    "small": {
+      "exchange": "xt",
+      "avg_price": 0.0006264557545226077,
+      "min_price": 0.00061,
+      "max_price": 0.000642
+    },
+    "big": {
+      "exchange": "jup",
+      "avg_price": 0.0006435823482260172,
+      "min_price": 0.0006435823482381129,
+      "max_price": 0.0006435823482381129
+    },
+    "buy_url": "https://www.xt.com/ru/trade/billy_usdt",
+    "sell_url": "https://jup.ag/swap?sell=3B5wuUrMEi5yATD7on46hKfej3pfmd7t1RKgrsN3pump&buy=Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+  },
+  "math": {
+    "dex_price": 0.0006435823482260172,
+    "maxPriceLimit": 0.0006429387658777912,
+    "calculated_safePrice": 0,
+    "calculated_safeAmountUsdt": 0,
+    "limit_usdt": 300
+  },
+  "orderbook": {
+    "asks": [
+      [
+        "0.000653",
+        13177.01
+      ],
+      [
+        "0.000655",
+        11177.92
+      ],
+      [
+        "0.000657",
+        41661.13
+      ],
+      [
+        "0.000660",
+        44630.52
+      ],
+      [
+        "0.000661",
+        49737.12
+      ],
+      [
+        "0.000663",
+        8818.89
+      ],
+      [
+        "0.000666",
+        53518.51
+      ],
+      [
+        "0.000668",
+        38658.47
+      ],
+      [
+        "0.000669",
+        50039.41
+      ],
+      [
+        "0.000671",
+        35016.4
+      ],
+      [
+        "0.000674",
+        27610.47
+      ],
+      [
+        "0.000676",
+        55619.57
+      ],
+      [
+        "0.000678",
+        21108.62
+      ],
+      [
+        "0.000679",
+        10490.61
+      ],
+      [
+        "0.000682",
+        26286.3
+      ]
+    ],
+    "bids": [
+      [
+        "0.000630",
+        13148.15
+      ],
+      [
+        "0.000627",
+        20871.26
+      ],
+      [
+        "0.000625",
+        25575.26
+      ],
+      [
+        "0.000623",
+        47276.32
+      ],
+      [
+        "0.000621",
+        42173.02
+      ]
+    ]
+  },
+  "error": null
+}

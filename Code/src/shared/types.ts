@@ -17,6 +17,7 @@ export interface ISignalPayload {
 
 export interface IOpenTabsPayload {
     urls: string[];
+    signal: ISignalPayload;
 }
 
 export interface IXTSnapshotResponse {

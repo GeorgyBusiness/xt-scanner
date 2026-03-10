@@ -22,7 +22,9 @@ import os
 
 # Файлы, которые мы не хотим видеть в отчете (например, сам файл отчета)
 IGNORED_FILES = [
-    '.DS_Store'
+    '.DS_Store',
+    '.mp3',
+    'Sounds/'
 ]
 
 # ВАЖНО:
@@ -49,11 +51,11 @@ def generate_markdown_diff():
     files = []
     try:
         # 1. Staged and unstaged changes known to git
-        cmd_output = subprocess.check_output(['git', 'diff', '--name-only', 'HEAD']).decode('utf-8')
+        cmd_output = subprocess.check_output(['git', 'diff', '--name-only', 'HEAD']).decode('utf-8', errors='replace')
         files.extend([f for f in cmd_output.splitlines() if f.strip()])
         
         # 2. Untracked files (new files not yet added)
-        untracked_output = subprocess.check_output(['git', 'ls-files', '--others', '--exclude-standard']).decode('utf-8')
+        untracked_output = subprocess.check_output(['git', 'ls-files', '--others', '--exclude-standard']).decode('utf-8', errors='replace')
         files.extend([f for f in untracked_output.splitlines() if f.strip()])
         
         # Remove duplicates just in case
@@ -88,14 +90,14 @@ def generate_markdown_diff():
             if is_untracked:
                  # For untracked files, we can't use git diff HEAD. Just read the file.
                  if os.path.exists(file_path):
-                     with open(file_path, 'r', encoding='utf-8') as f:
+                     with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
                          content = f.read()
                      diff_output = f"New file: {file_path}\n@@ -0,0 +1,{len(content.splitlines())} @@\n+{content.replace(chr(10), chr(10)+'+')}"
                  else:
                      diff_output = "" # Should not happen if in list
             else:
                 # Get diff for specific file
-                diff_output = subprocess.check_output(['git', 'diff', 'HEAD', '--', file_path]).decode('utf-8')
+                diff_output = subprocess.check_output(['git', 'diff', 'HEAD', '--', file_path]).decode('utf-8', errors='replace')
             
             if not diff_output.strip():
                 continue

@@ -1,0 +1,120 @@
+{
+  "timestamp": "2026-03-10T00:27:39.949Z",
+  "symbol": "GP",
+  "status": "SUCCESS_EXECUTED",
+  "signal_data": {
+    "symbol": "GP",
+    "arb_percent": 2.89,
+    "arbitrage_amount_usdt": 242.98,
+    "small": {
+      "exchange": "xt",
+      "avg_price": 0.21932321210752204,
+      "min_price": 0.2165,
+      "max_price": 0.2243
+    },
+    "big": {
+      "exchange": "jup",
+      "avg_price": 0.22610710876157827,
+      "min_price": 0.226107110804561,
+      "max_price": 0.226107110804561
+    },
+    "buy_url": "https://www.xt.com/ru/trade/gp_usdt",
+    "sell_url": "https://jup.ag/swap?sell=31k88G5Mq7ptbRDf3AM13HAq6wRQHXHikR8hik7wPygk&buy=Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+  },
+  "math": {
+    "dex_price": 0.22610710876157827,
+    "maxPriceLimit": 0.2258810016528167,
+    "calculated_safePrice": 0.2257,
+    "calculated_safeAmountUsdt": 260.670876,
+    "limit_usdt": 300,
+    "final_price_str": "0.2257",
+    "final_amount_str": "260.67"
+  },
+  "orderbook": {
+    "asks": [
+      [
+        "0.2165",
+        58.63
+      ],
+      [
+        "0.2176",
+        89.27
+      ],
+      [
+        "0.2187",
+        712.67
+      ],
+      [
+        "0.2202",
+        45.02
+      ],
+      [
+        "0.2207",
+        73.35
+      ],
+      [
+        "0.2225",
+        43.79
+      ],
+      [
+        "0.2243",
+        88.06
+      ],
+      [
+        "0.2257",
+        75.74
+      ],
+      [
+        "0.2277",
+        66.21
+      ],
+      [
+        "0.2289",
+        34.7
+      ],
+      [
+        "0.2306",
+        47.79
+      ],
+      [
+        "0.2315",
+        58.92
+      ],
+      [
+        "0.2329",
+        78.73
+      ],
+      [
+        "0.2352",
+        59.73
+      ],
+      [
+        "0.2370",
+        66.53
+      ]
+    ],
+    "bids": [
+      [
+        "0.2130",
+        45.53
+      ],
+      [
+        "0.2113",
+        48.79
+      ],
+      [
+        "0.2108",
+        1161.56
+      ],
+      [
+        "0.2100",
+        75.26
+      ],
+      [
+        "0.2081",
+        76.62
+      ]
+    ]
+  },
+  "error": null
+}

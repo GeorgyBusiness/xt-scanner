@@ -1,0 +1,120 @@
+{
+  "timestamp": "2026-03-09T23:38:24.018Z",
+  "symbol": "JELLYBEAN",
+  "status": "SUCCESS_EXECUTED",
+  "signal_data": {
+    "symbol": "JELLYBEAN",
+    "arb_percent": 4.55,
+    "arbitrage_amount_usdt": 280.55,
+    "small": {
+      "exchange": "xt",
+      "avg_price": 0.0011199999999999997,
+      "min_price": 0.00112,
+      "max_price": 0.00112
+    },
+    "big": {
+      "exchange": "jup",
+      "avg_price": 0.001173274568773718,
+      "min_price": 0.0011732745688206032,
+      "max_price": 0.0011732745688206032
+    },
+    "buy_url": "https://www.xt.com/ru/trade/jellybean_usdt",
+    "sell_url": "https://jup.ag/swap?sell=412zDygnwP9DzitnQVgRKUFFTDmrYScFch6P2k39pump&buy=Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+  },
+  "math": {
+    "dex_price": 0.001173274568773718,
+    "maxPriceLimit": 0.0011721012942049443,
+    "calculated_safePrice": 0.00112,
+    "calculated_safeAmountUsdt": 133.146664,
+    "limit_usdt": 150,
+    "final_price_str": "0.00112",
+    "final_amount_str": "133.15"
+  },
+  "orderbook": {
+    "asks": [
+      [
+        "0.001120",
+        118880.95
+      ],
+      [
+        "0.001231",
+        934.25
+      ],
+      [
+        "0.001249",
+        3840.79
+      ],
+      [
+        "0.001303",
+        4037.69
+      ],
+      [
+        "0.001335",
+        2561.09
+      ],
+      [
+        "0.001358",
+        3345.61
+      ],
+      [
+        "0.001386",
+        3155.2
+      ],
+      [
+        "0.001439",
+        1222.91
+      ],
+      [
+        "0.001459",
+        2830.32
+      ],
+      [
+        "0.001488",
+        4890.2
+      ],
+      [
+        "0.001499",
+        42233.6
+      ],
+      [
+        "0.001532",
+        3622.64
+      ],
+      [
+        "0.001538",
+        2667.29
+      ],
+      [
+        "0.001571",
+        5479.34
+      ],
+      [
+        "0.001619",
+        4821.5
+      ]
+    ],
+    "bids": [
+      [
+        "0.001119",
+        4229.74
+      ],
+      [
+        "0.001079",
+        6569.16
+      ],
+      [
+        "0.001047",
+        5906.2
+      ],
+      [
+        "0.001018",
+        37857.77
+      ],
+      [
+        "0.000994",
+        6999.9
+      ]
+    ]
+  },
+  "error": null
+}

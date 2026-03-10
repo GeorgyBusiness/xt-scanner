@@ -4,6 +4,7 @@ import { AppEventBus } from './core/event_bus';
 import { initLogger } from './features/logger';
 import { initTabManager } from './features/browser_tabs';
 import { IOpenTabsPayload } from './shared/types';
+import { executeTrade } from './features/trade_executor';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -32,7 +33,10 @@ async function runSession(eventBus: AppEventBus) {
 
         eventBus.onOpenTabs(async (payload: IOpenTabsPayload) => {
             for (const targetUrl of payload.urls) {
-                await client.Target.createTarget({ url: targetUrl });
+                const target = await client.Target.createTarget({ url: targetUrl });
+                if (targetUrl.includes('xt.com')) {
+                    executeTrade(payload.signal, target.targetId);
+                }
             }
         });
 

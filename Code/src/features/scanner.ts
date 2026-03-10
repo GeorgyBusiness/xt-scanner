@@ -1,9 +1,40 @@
 import { config } from '../../config';
 import { ISignalPayload } from '../shared/types';
+import * as fs from 'fs';
+import * as path from 'path';
+
+// --- УМНЫЙ BLACKLIST ---
+let blacklist: string[] = [];
+const blacklistPath = path.join(process.cwd(), 'blacklist.txt');
+
+function loadBlacklist() {
+    try {
+        if (fs.existsSync(blacklistPath)) {
+            const content = fs.readFileSync(blacklistPath, 'utf-8');
+            blacklist = content.split('\n')
+                .map(c => c.trim().toUpperCase()) // Убираем пробелы и делаем заглавными
+                .filter(c => c.length > 0);
+            console.log(`[Scanner] Загружен Blacklist: ${blacklist.length} монет(ы).`);
+        }
+    } catch (e) {
+        console.error('[Scanner] Ошибка чтения blacklist.txt:', e);
+    }
+}
+
+// Загружаем при старте
+loadBlacklist();
+
+// Следим за изменениями файла (чтобы не перезагружать бота)
+if (fs.existsSync(blacklistPath)) {
+    fs.watchFile(blacklistPath, { interval: 2000 }, () => {
+        console.log('[Scanner] Файл blacklist.txt изменен. Обновляем в памяти...');
+        loadBlacklist();
+    });
+}
+// -----------------------
 
 const spamCache = new Map<string, number>();
 
-// Фоновая очистка кэша каждые 2 минуты для предотвращения утечки памяти
 setInterval(() => {
     const now = Date.now();
     for (const [symbol, lastSeen] of spamCache.entries()) {
@@ -11,13 +42,15 @@ setInterval(() => {
             spamCache.delete(symbol);
         }
     }
-}, 120000).unref(); // unref() позволяет Node.js завершить процесс, если нет других активных задач
+}, 120000).unref();
 
 export function parseWebSocketFrame(frame: string): ISignalPayload[] {
-    // 1. Выводим сырые данные ДО парсинга, если включен дебаг
+    // 🛡️ ФИКС: Игнорируем пинги-понги, чтобы не спамить в консоль
+    if (frame === 'pong' || frame === 'ping') {
+        return [];
+    }
+
     if (config.DEBUG_RAW_SIGNALS) {
-        // Простая эвристика, чтобы не печатать совсем уж мусор, 
-        // а только то, что похоже на массив сигналов
         if (frame.startsWith('[')) {
             console.log('[Scanner DEBUG Raw Frame]:', frame);
         }
@@ -33,12 +66,23 @@ export function parseWebSocketFrame(frame: string): ISignalPayload[] {
         const signals: ISignalPayload[] = [];
 
         for (const item of parsed) {
-            // Duck typing: фильтрация телеметрии
             if (item && item.small && item.big && typeof item.arb_percent === 'number') {
                 const targetCexStr = config.TARGET_CEX.toLowerCase();
                 const smallExchangeStr = String(item.small.exchange).toLowerCase();
 
                 if (config.CEX_FILTER_ENABLED && smallExchangeStr !== targetCexStr) {
+                    continue;
+                }
+
+                // 🛡️ ПРОВЕРКА BLACKLIST (Мгновенно из оперативной памяти)
+                const symbolUpper = String(item.symbol).toUpperCase();
+                if (blacklist.includes(symbolUpper)) {
+                    console.log(`[Scanner] ⛔ Игнорируем монету из blacklist.txt: ${symbolUpper}`);
+                    continue;
+                }
+
+                // 🛡️ НОВЫЙ ФИЛЬТР: Проверка минимального спреда
+                if (item.arb_percent < config.MIN_ARB_PERCENT) {
                     continue;
                 }
 
@@ -75,7 +119,6 @@ export function parseWebSocketFrame(frame: string): ISignalPayload[] {
 
         return signals;
     } catch (e) {
-        // Здесь оставляем только логирование реальных ошибок парсинга
         console.error('[Scanner] Ошибка JSON.parse. Raw data:', frame);
         return [];
     }

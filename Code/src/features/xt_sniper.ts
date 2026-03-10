@@ -1,4 +1,5 @@
 import CDP from 'chrome-remote-interface';
+import { config } from '../../config';
 
 export class XTSniper {
     private cdpClient: CDP.Client;
@@ -40,8 +41,14 @@ export class XTSniper {
     private async getTradeButton(): Promise<{ x: number, y: number, text: string } | null> {
         const expression = `
             (() => {
-                const buttons = Array.from(document.querySelectorAll('button')).filter(b => b.innerText.includes('Buy'));
-                const tradeButtons = buttons.filter(b => !b.innerText.includes('Crypto'));
+                // 🛡️ ФИКС: Ищем кнопку с текстом Buy ИЛИ Купить
+                const buttons = Array.from(document.querySelectorAll('button')).filter(b => 
+                    b.innerText.includes('Buy') || b.innerText.includes('Купить')
+                );
+                // Отсекаем кнопки типа "Buy Crypto" или "Купить Крипту" в шапке
+                const tradeButtons = buttons.filter(b => 
+                    !b.innerText.includes('Crypto') && !b.innerText.includes('Крипт')
+                );
                 
                 const el = tradeButtons[tradeButtons.length - 1]; 
                 if (!el) return null;
@@ -93,8 +100,8 @@ export class XTSniper {
     public async executeBuy(price: string, amountUsdt: string) {
         console.log(`[XTSniper] Executing BUY ${amountUsdt} USDT at price ${price}`);
 
-        // 1. Ввод Цены
-        const priceXPath = "//div[text()='Price']/following-sibling::input | //div[contains(text(), 'Price')]/following-sibling::div//input[1]";
+        // 1. Ввод Цены (Поддержка Price и Цена)
+        const priceXPath = "//div[text()='Price' or text()='Цена']/following-sibling::input | //div[contains(text(), 'Price') or contains(text(), 'Цена')]/following-sibling::div//input[1]";
         const priceCoords = await this.getElementCenter(priceXPath);
         if (priceCoords) {
             await this.clickAt(priceCoords.x, priceCoords.y, 3);
@@ -102,8 +109,8 @@ export class XTSniper {
             await this.typeText(price);
         }
 
-        // 2. Ввод Суммы USDT
-        const amountXPath = "//div[text()='Total']/following-sibling::input | //div[contains(text(), 'Total')]/following-sibling::div//input[1]";
+        // 2. Ввод Суммы USDT (Поддержка Total и Всего)
+        const amountXPath = "//div[text()='Total' or text()='Всего']/following-sibling::input | //div[contains(text(), 'Total') or contains(text(), 'Всего')]/following-sibling::div//input[1]";
         const amountCoords = await this.getElementCenter(amountXPath);
         if (amountCoords) {
             await this.clickAt(amountCoords.x, amountCoords.y, 3);
@@ -127,7 +134,11 @@ export class XTSniper {
             await this.delay(30); // Микро-задержка движения мыши
 
             // Реальный клик (Стреляем!)
-            await this.clickAt(buttonData.x, buttonData.y, 1);
+            if (!config.DRY_RUN) {
+                await this.clickAt(buttonData.x, buttonData.y, 1);
+            } else {
+                console.log(`[XTSniper] DRY_RUN is active. Skipping final click.`);
+            }
 
         } else {
             console.warn(`[XTSniper] Failed to find Buy button element.`);

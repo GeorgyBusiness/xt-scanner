@@ -25,7 +25,7 @@ export function initTabManager(eventBus: AppEventBus) {
         }
 
         if (urlsToOpen.length > 0) {
-            eventBus.emitOpenTabs({ urls: urlsToOpen });
+            eventBus.emitOpenTabs({ urls: urlsToOpen, signal: payload });
         }
     });
 }

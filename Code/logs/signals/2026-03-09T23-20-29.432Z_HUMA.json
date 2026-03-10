@@ -1,0 +1,120 @@
+{
+  "timestamp": "2026-03-09T23:20:29.432Z",
+  "symbol": "HUMA",
+  "status": "SUCCESS_EXECUTED",
+  "signal_data": {
+    "symbol": "HUMA",
+    "arb_percent": 0.28,
+    "arbitrage_amount_usdt": 3521.54,
+    "small": {
+      "exchange": "xt",
+      "avg_price": 0.01546049932102536,
+      "min_price": 0.01542,
+      "max_price": 0.0155
+    },
+    "big": {
+      "exchange": "jup",
+      "avg_price": 0.015535409162808924,
+      "min_price": 0.015535409163491654,
+      "max_price": 0.015535409163491654
+    },
+    "buy_url": "https://www.xt.com/ru/trade/huma_usdt",
+    "sell_url": "https://jup.ag/swap?sell=HUMA1821qVDKta3u2ovmfDQeW2fSQouSKE8fkF44wvGw&buy=Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
+  },
+  "math": {
+    "dex_price": 0.015535409162808924,
+    "maxPriceLimit": 0.015519873753646116,
+    "calculated_safePrice": 0.01546,
+    "calculated_safeAmountUsdt": 150,
+    "limit_usdt": 150,
+    "final_price_str": "0.01546",
+    "final_amount_str": "150.00"
+  },
+  "orderbook": {
+    "asks": [
+      [
+        "0.01545",
+        858
+      ],
+      [
+        "0.01546",
+        9691
+      ],
+      [
+        "0.01547",
+        9831
+      ],
+      [
+        "0.01548",
+        15890
+      ],
+      [
+        "0.01549",
+        129651
+      ],
+      [
+        "0.01550",
+        1960
+      ],
+      [
+        "0.01551",
+        15130
+      ],
+      [
+        "0.01552",
+        3135
+      ],
+      [
+        "0.01553",
+        4724
+      ],
+      [
+        "0.01554",
+        14517
+      ],
+      [
+        "0.01555",
+        14805
+      ],
+      [
+        "0.01556",
+        6154
+      ],
+      [
+        "0.01557",
+        12112
+      ],
+      [
+        "0.01558",
+        96622
+      ],
+      [
+        "0.01559",
+        14699
+      ]
+    ],
+    "bids": [
+      [
+        "0.01543",
+        2477
+      ],
+      [
+        "0.01542",
+        5469
+      ],
+      [
+        "0.01541",
+        1851
+      ],
+      [
+        "0.01540",
+        4210
+      ],
+      [
+        "0.01539",
+        85512
+      ]
+    ]
+  },
+  "error": null
+}
